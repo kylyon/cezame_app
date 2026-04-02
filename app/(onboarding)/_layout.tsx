@@ -1,40 +1,77 @@
 import React, { useRef, useState } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Dimensions, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // On récupère la largeur de l'écran pour que chaque slide prenne tout l'espace
 const { width } = Dimensions.get('window');
 
 // 1. Définition des données de l'onboarding
-const slides = [
+const questions = [
   {
     id: '1',
-    title: 'Bienvenue',
-    description: 'Découvrez notre nouvelle application incroyable et simplifiez votre vie au quotidien.',
-    backgroundColor: '#4facfe', // Bleu
+    category: '🏥 Santé',
+    question: "Sur une échelle de stress, prendre un RDV médical ou gérer tes papiers de la Sécu, c'est...",
+    options: [
+      { id: 'a', label: "Tranquille, je gère sans problème", score: 1, icon: "😎" },
+      { id: 'b', label: "Je repousse souvent au lendemain", score: 3, icon: "⏳" },
+      { id: 'c', label: "Une véritable source d'angoisse", score: 5, icon: "😨" }
+    ],
+    backgroundColor: '#FF6B6B', // Rouge corail
   },
   {
     id: '2',
-    title: 'Rapide et Sécurisé',
-    description: 'Vos données sont protégées avec les meilleurs standards de sécurité du marché.',
-    backgroundColor: '#00f2fe', // Bleu clair
+    category: '💰 Finance',
+    question: "Face à une dépense imprévue ou un découvert, quelle est ta réaction ?",
+    options: [
+      { id: 'a', label: "Je règle le problème de suite", score: 1, icon: "💪" },
+      { id: 'b', label: "Je stresse mais je regarde l'appli", score: 3, icon: "👀" },
+      { id: 'c', label: "Je fais l'autruche totale", score: 5, icon: "🙈" }
+    ],
+    backgroundColor: '#4ECDC4', // Turquoise
   },
   {
     id: '3',
-    title: 'Commençons !',
-    description: 'Inscrivez-vous dès maintenant pour profiter de toutes nos fonctionnalités exclusives.',
-    backgroundColor: '#43e97b', // Vert
+    category: '🚗 Voiture',
+    question: "L'assurance, le contrôle technique, le garage... tu en es où ?",
+    options: [
+      { id: 'a', label: "J'ai toutes les dates en tête", score: 1, icon: "📅" },
+      { id: 'b', label: "C'est un peu flou mais je m'en sors", score: 3, icon: "🤷‍♂️" },
+      { id: 'c', label: "L'idée même me paralyse", score: 5, icon: "🥶" }
+    ],
+    backgroundColor: '#FFD166', // Jaune moutarde (texte sombre nécessaire ici)
   },
+  {
+    id: '4',
+    category: '📄 Administration',
+    question: "Quand tu reçois un courrier avec le logo 'République Française', tu l'ouvres :",
+    options: [
+      { id: 'a', label: "Le jour même, et je le classe", score: 1, icon: "📁" },
+      { id: 'b', label: "Dans la semaine", score: 3, icon: "🗓️" },
+      { id: 'c', label: "Quand la pile devient trop haute", score: 5, icon: "📚" }
+    ],
+    backgroundColor: '#118AB2', // Bleu profond
+  },
+  {
+    id: '5',
+    category: '🏠 Logement',
+    question: "Sais-tu comment souscrire ou résilier tes contrats d'électricité et internet ?",
+    options: [
+      { id: 'a', label: "Oui, c'est facile", score: 1, icon: "✅" },
+      { id: 'b', label: "Avec l'aide d'un proche, oui", score: 3, icon: "🤝" },
+      { id: 'c', label: "Rien que d'y penser, j'abandonne", score: 5, icon: "🏳️" }
+    ],
+    backgroundColor: '#073B4C', // Bleu marine
+  }
 ];
 
 export default function OnboardingLayout() {
     const colorScheme = useColorScheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({}); // Stocke les réponses : { '1': 'a', '2': 'c', ... }
   const flatListRef = useRef<FlatList>(null);
 
-  // 2. Met à jour l'index quand l'utilisateur fait défiler les écrans
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: any[] }) => {
+  const onViewableItemsChanged = useRef(({ viewableItems } : { viewableItems: any[] }) => {
     if (viewableItems.length > 0) {
       setCurrentIndex(viewableItems[0].index);
     }
@@ -42,165 +79,208 @@ export default function OnboardingLayout() {
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
-  // 3. Fonction pour le bouton "Suivant" / "Commencer"
-  const goNext = () => {
-    if (!flatListRef.current) return
+  // Sélectionner une réponse
+  const handleSelectOption = (questionId: string, optionId: string) => {
+    setAnswers({ ...answers, [questionId]: optionId });
 
-    if (currentIndex < slides.length - 1) {
-      // Passer au slide suivant
-      flatListRef.current.scrollToIndex({ index: currentIndex + 1 });
-    } else {
-      // Action à la fin de l'onboarding (ex: Navigation vers Login ou Accueil)
-      console.log("Onboarding terminé ! Remplacer par la navigation.");
-      // navigation.replace('Home');
+    // Auto-scroll vers la prochaine question après un petit délai
+    if (currentIndex < questions.length - 1) {
+      setTimeout(() => {
+        if (!flatListRef.current) return
+        flatListRef.current.scrollToIndex({ index: currentIndex + 1, animated: true });
+      }, 400); // 400ms pour laisser à l'utilisateur le temps de voir sa sélection
     }
   };
 
-  const goPrevious = () => {
+  const goBack = () => {
     if (!flatListRef.current) return
 
     if (currentIndex > 0) {
-      // Passer au slide précédent
-      flatListRef.current.scrollToIndex({ index: currentIndex - 1 });
+      flatListRef.current.scrollToIndex({ index: currentIndex - 1, animated: true });
     }
+  }
+ 
+  const finishOnboarding = () => {
+    // Calcul du score de phobie administrative par exemple
+    console.log("Réponses de l'utilisateur :", answers);
+    // navigation.replace('Home');
   };
 
-  // 4. Rendu de chaque page (Slide)
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item } : { item: any }) => {
+    const isDarkBackground = item.backgroundColor !== '#FFD166'; // Le jaune nécessite un texte foncé
+    const textColor = isDarkBackground ? '#FFFFFF' : '#333333';
+
     return (
       <View style={[styles.slide, { backgroundColor: item.backgroundColor }]}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
+        <TouchableOpacity onPress={goBack}>
+          <Text style={styles.goBackButton}>← Retour</Text>
+        </TouchableOpacity>
+        <Text style={[styles.category, { color: textColor }]}>{item.category}</Text>
+        <Text style={[styles.question, { color: textColor }]}>{item.question}</Text>
+        
+        <View style={styles.optionsContainer}>
+          {item.options.map((option: any) => {
+            const isSelected = answers[item.id] === option.id;
+            return (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.optionButton,
+                  isSelected && styles.optionButtonSelected
+                ]}
+                activeOpacity={0.7}
+                onPress={() => handleSelectOption(item.id, option.id)}
+              >
+                <Text style={styles.optionIcon}>{option.icon}</Text>
+                <Text style={[
+                  styles.optionText, 
+                  isSelected && styles.optionTextSelected
+                ]}>
+                  {option.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
     );
   };
 
+  const currentBgColor = questions[currentIndex].backgroundColor;
+  // Calcul de la progression
+  const progressPercent = ((currentIndex + 1) / questions.length) * 100;
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Liste défilante horizontale */}
+    <SafeAreaView style={[styles.container, { backgroundColor: currentBgColor }]}>
+      <StatusBar barStyle={currentBgColor === '#FFD166' ? 'dark-content' : 'light-content'} backgroundColor={currentBgColor} />
+      
+      {/* Barre de progression */}
+      <View style={styles.progressContainer}>
+        <View style={[styles.progressBar, { width: `${progressPercent}%` }]} />
+      </View>
+
       <FlatList
-        data={slides}
+        data={questions}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        pagingEnabled // C'est cette propriété qui crée l'effet d'écran par écran
+        pagingEnabled
         bounces={false}
         ref={flatListRef}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewConfig}
+        scrollEnabled={false} // On désactive le scroll manuel pour forcer la réponse
       />
 
-      {/* Footer avec les petits points et le bouton */}
+      {/* Footer avec bouton Terminer si on est à la fin */}
       <View style={styles.footer}>
-        <View style={styles.pagination}>
-          {slides.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                currentIndex === index ? styles.activeDot : null, // Change la couleur si actif
-              ]}
-            />
-          ))}
-        </View>
-
-          <View style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 20,
-            width: width,
-            paddingHorizontal: 20,
-          }}>
-            {currentIndex > 0 &&
-            <TouchableOpacity style={styles.button} onPress={goPrevious} activeOpacity={0.8}>
-              <Text style={styles.buttonText}>
-                Precédent
-              </Text>
-            </TouchableOpacity>}
-            <TouchableOpacity style={styles.button} onPress={goNext} activeOpacity={0.8}>
-              <Text style={styles.buttonText}>
-                {currentIndex === slides.length - 1 ? 'Commencer' : 'Suivant'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+        {currentIndex === questions.length - 1 && answers[questions[currentIndex].id] && (
+          <TouchableOpacity style={styles.finishButton} onPress={finishOnboarding} activeOpacity={0.8}>
+            <Text style={styles.finishButtonText}>Découvrir mon profil 🚀</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
 }
 
-
-
-
-
-
-// 5. Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  progressContainer: {
+    height: 6,
+    width: '90%',
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    alignSelf: 'center',
+    borderRadius: 3,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 3,
   },
   slide: {
-    width: width, // Prend toute la largeur de l'écran
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    width: width,
+    paddingHorizontal: 30,
+    paddingTop: 60,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  description: {
+  category: {
     fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    lineHeight: 24,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    marginBottom: 15,
+  },
+  question: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    lineHeight: 34,
+  },
+  optionsContainer: {
+    width: '100%',
+  },
+  optionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  optionButtonSelected: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#333',
+    borderWidth: 2,
+  },
+  optionIcon: {
+    fontSize: 24,
+    marginRight: 15,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#444',
+    fontWeight: '500',
+    flex: 1, // Permet au texte de passer à la ligne sans écraser l'icône
+  },
+  optionTextSelected: {
+    color: '#000',
+    fontWeight: 'bold',
   },
   footer: {
     position: 'absolute',
     bottom: 50,
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: 20,
   },
-  pagination: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    backgroundColor: '#fff',
-    width: 20, // Plus large pour le point actif
-  },
-  button: {
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    maxWidth: "100%",
-    flexGrow: 1,
-    alignItems: 'center',
+  finishButton: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 30,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  buttonText: {
-    fontSize: 16,
+  finishButtonText: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+  },
+  goBackButton: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 20,
   },
 });
