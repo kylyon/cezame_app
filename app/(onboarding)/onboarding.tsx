@@ -131,7 +131,7 @@ export default function Onboarding() {
                   isSelected && styles.optionButtonSelected
                 ]}
                 activeOpacity={0.7}
-                onPress={() => handleSelectOption(item.id, option.id)}
+                onPress={() => handleSelectOption(item.id, option.score)}
               >
                 <Text style={styles.optionIcon}>{option.icon}</Text>
                 <Text style={[
