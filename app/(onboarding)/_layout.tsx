@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Dimensions, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // On récupère la largeur de l'écran pour que chaque slide prenne tout l'espace
 const { width } = Dimensions.get('window');
@@ -30,10 +31,10 @@ export default function OnboardingLayout() {
     const colorScheme = useColorScheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList>(null);
 
   // 2. Met à jour l'index quand l'utilisateur fait défiler les écrans
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: any[] }) => {
     if (viewableItems.length > 0) {
       setCurrentIndex(viewableItems[0].index);
     }
@@ -43,6 +44,8 @@ export default function OnboardingLayout() {
 
   // 3. Fonction pour le bouton "Suivant" / "Commencer"
   const goNext = () => {
+    if (!flatListRef.current) return
+
     if (currentIndex < slides.length - 1) {
       // Passer au slide suivant
       flatListRef.current.scrollToIndex({ index: currentIndex + 1 });
@@ -53,8 +56,17 @@ export default function OnboardingLayout() {
     }
   };
 
+  const goPrevious = () => {
+    if (!flatListRef.current) return
+
+    if (currentIndex > 0) {
+      // Passer au slide précédent
+      flatListRef.current.scrollToIndex({ index: currentIndex - 1 });
+    }
+  };
+
   // 4. Rendu de chaque page (Slide)
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: { item: any }) => {
     return (
       <View style={[styles.slide, { backgroundColor: item.backgroundColor }]}>
         <Text style={styles.title}>{item.title}</Text>
@@ -93,11 +105,27 @@ export default function OnboardingLayout() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={goNext} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>
-            {currentIndex === slides.length - 1 ? 'Commencer' : 'Suivant'}
-          </Text>
-        </TouchableOpacity>
+          <View style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 20,
+            width: width,
+            paddingHorizontal: 20,
+          }}>
+            {currentIndex > 0 &&
+            <TouchableOpacity style={styles.button} onPress={goPrevious} activeOpacity={0.8}>
+              <Text style={styles.buttonText}>
+                Precédent
+              </Text>
+            </TouchableOpacity>}
+            <TouchableOpacity style={styles.button} onPress={goNext} activeOpacity={0.8}>
+              <Text style={styles.buttonText}>
+                {currentIndex === slides.length - 1 ? 'Commencer' : 'Suivant'}
+              </Text>
+            </TouchableOpacity>
+          </View>
       </View>
     </SafeAreaView>
   );
@@ -161,7 +189,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,
-    width: '80%',
+    maxWidth: "100%",
+    flexGrow: 1,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
