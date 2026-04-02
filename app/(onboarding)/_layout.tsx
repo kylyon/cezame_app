@@ -16,7 +16,7 @@ const questions = [
       { id: 'b', label: "Je repousse souvent au lendemain", score: 3, icon: "⏳" },
       { id: 'c', label: "Une véritable source d'angoisse", score: 5, icon: "😨" }
     ],
-    backgroundColor: '#FF6B6B', // Rouge corail
+    backgroundColor: '#AB87FF', // Violet
   },
   {
     id: '2',
@@ -27,7 +27,7 @@ const questions = [
       { id: 'b', label: "Je stresse mais je regarde l'appli", score: 3, icon: "👀" },
       { id: 'c', label: "Je fais l'autruche totale", score: 5, icon: "🙈" }
     ],
-    backgroundColor: '#4ECDC4', // Turquoise
+    backgroundColor: '#8CD7D0', // Turquoise
   },
   {
     id: '3',
@@ -38,7 +38,7 @@ const questions = [
       { id: 'b', label: "C'est un peu flou mais je m'en sors", score: 3, icon: "🤷‍♂️" },
       { id: 'c', label: "L'idée même me paralyse", score: 5, icon: "🥶" }
     ],
-    backgroundColor: '#FFD166', // Jaune moutarde (texte sombre nécessaire ici)
+    backgroundColor: '#FFACE4', // Rose
   },
   {
     id: '4',
@@ -49,7 +49,7 @@ const questions = [
       { id: 'b', label: "Dans la semaine", score: 3, icon: "🗓️" },
       { id: 'c', label: "Quand la pile devient trop haute", score: 5, icon: "📚" }
     ],
-    backgroundColor: '#118AB2', // Bleu profond
+    backgroundColor: '#B4E1FF', // Bleu profond
   },
   {
     id: '5',
@@ -60,7 +60,7 @@ const questions = [
       { id: 'b', label: "Avec l'aide d'un proche, oui", score: 3, icon: "🤝" },
       { id: 'c', label: "Rien que d'y penser, j'abandonne", score: 5, icon: "🏳️" }
     ],
-    backgroundColor: '#073B4C', // Bleu marine
+    backgroundColor: '#B2FA84', // Vert
   }
 ];
 
@@ -113,7 +113,7 @@ export default function OnboardingLayout() {
     return (
       <View style={[styles.slide, { backgroundColor: item.backgroundColor }]}>
         <TouchableOpacity onPress={goBack}>
-          <Text style={styles.goBackButton}>← Retour</Text>
+          <Text style={styles.goBackButton}>⬅️ Retour</Text>
         </TouchableOpacity>
         <Text style={[styles.category, { color: textColor }]}>{item.category}</Text>
         <Text style={[styles.question, { color: textColor }]}>{item.question}</Text>
