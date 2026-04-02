@@ -9,9 +9,9 @@ export default function OnboardingResults({route} : {route: any}) {
     const { answers } = route.params;
     const router = useRouter();
 
-    const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
+    const totalScore = (Object.values(answers) as number[]).reduce((sum: number, score: number) => sum + score, 0);
     const maxScore = Object.keys(answers).length * 5; // Supposant que le score max par question est 5
-    const scorePercentage = (totalScore / maxScore) * 100;
+    const scorePercentage = (totalScore as number / maxScore) * 100;
 
     // Déterminer le niveau de phobie administrative
     const getPhobiaLevel = () => {
@@ -21,6 +21,18 @@ export default function OnboardingResults({route} : {route: any}) {
     };
 
     const phobiaInfo = getPhobiaLevel();
+
+    // Personnalisation par note de réponse
+    const getAnswerStyle = (score: number) => {
+        switch (score) {
+            case 1: return { color: '#06D6A0', bg: '#F0FDF9', emoji: '😊', label: 'Aucune difficulté', borderColor: '#06D6A0' };
+            case 2: return { color: '#4ECDC4', bg: '#F0FAFA', emoji: '🙂', label: 'Légère anxiété', borderColor: '#4ECDC4' };
+            case 3: return { color: '#FFD60A', bg: '#FFFDF0', emoji: '😐', label: 'Anxiété modérée', borderColor: '#FFD60A' };
+            case 4: return { color: '#FF6B35', bg: '#FFF5F0', emoji: '😟', label: 'Forte anxiété', borderColor: '#FF6B35' };
+            case 5: return { color: '#EF476F', bg: '#FFF0F4', emoji: '😰', label: 'Phobie sévère', borderColor: '#EF476F' };
+            default: return { color: '#118AB2', bg: '#F0F8FF', emoji: '❓', label: 'Non évalué', borderColor: '#118AB2' };
+        }
+    };
 
     return (
         <LinearGradient
@@ -69,30 +81,63 @@ export default function OnboardingResults({route} : {route: any}) {
                     {/* Détails des réponses */}
                     <View style={styles.answersSection}>
                         <Text style={styles.sectionTitle}>📊 Détail de vos réponses</Text>
-                        {Object.entries(answers).map(([question, answer], index) => (
-                            <View key={question} style={styles.answerCard}>
-                                <View style={styles.answerHeader}>
-                                    <View style={styles.questionNumber}>
-                                        <Text style={styles.questionNumberText}>{index + 1}</Text>
+                        {(Object.entries(answers) as [string, number][]).map(([question, answer], index) => {
+                            const answerStyle = getAnswerStyle(answer);
+                            return (
+                                <View
+                                    key={question}
+                                    style={[
+                                        styles.answerCard,
+                                        {
+                                            backgroundColor: answerStyle.bg,
+                                            borderLeftWidth: 5,
+                                            borderLeftColor: answerStyle.borderColor,
+                                        }
+                                    ]}
+                                >
+                                    {/* En-tête de la carte */}
+                                    <View style={styles.answerHeader}>
+                                        <View style={[styles.questionNumber, { backgroundColor: answerStyle.color }]}>
+                                            <Text style={styles.questionNumberText}>{index + 1}</Text>
+                                        </View>
+                                        <Text style={styles.questionText}>{question}</Text>
                                     </View>
-                                    <Text style={styles.questionText}>{question}</Text>
-                                </View>
-                                <View style={styles.answerValueContainer}>
+
+                                    {/* Séparateur */}
+                                    <View style={[styles.divider, { backgroundColor: answerStyle.color + '33' }]} />
+
+                                    {/* Badge niveau + score */}
+                                    <View style={styles.answerValueContainer}>
+                                        <View style={[styles.labelBadge, { backgroundColor: answerStyle.color + '22' }]}>
+                                            <Text style={styles.labelEmoji}>{answerStyle.emoji}</Text>
+                                            <Text style={[styles.labelText, { color: answerStyle.color }]}>
+                                                {answerStyle.label}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.scoreRight}>
+                                            <Text style={[styles.answerValue, { color: answerStyle.color }]}>
+                                                {answer}/5
+                </Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Indicateur de dots */}
                                     <View style={styles.scoreIndicator}>
                                         {[...Array(5)].map((_, i) => (
                                             <View
                                                 key={i}
                                                 style={[
                                                     styles.scoreDot,
-                                                    i < answer && styles.scoreDotFilled
+                                                    i < answer
+                                                        ? { backgroundColor: answerStyle.color }
+                                                        : styles.scoreDotEmpty
                                                 ]}
                                             />
                                         ))}
                                     </View>
-                                    <Text style={styles.answerValue}>{answer}/5</Text>
                                 </View>
-                            </View>
-                        ))}
+                            );
+                        })}
                     </View>
 
                     {/* Bouton d'action */}
@@ -105,7 +150,7 @@ export default function OnboardingResults({route} : {route: any}) {
 
                     <View style={styles.bottomSpacer} />
                 </ScrollView>
-            </SafeAreaView>
+        </SafeAreaView>
         </LinearGradient>
     )
 }
@@ -238,28 +283,50 @@ const styles = StyleSheet.create({
         color: '#333',
         fontWeight: '600',
     },
+    divider: {
+        height: 1,
+        marginBottom: 12,
+    },
     answerValueContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 12,
+    },
+    labelBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
+    },
+    labelEmoji: {
+        fontSize: 16,
+    },
+    labelText: {
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    scoreRight: {
+        alignItems: 'flex-end',
     },
     scoreIndicator: {
         flexDirection: 'row',
-        gap: 6,
+        gap: 8,
+        marginTop: 4,
     },
     scoreDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+    },
+    scoreDotEmpty: {
         backgroundColor: '#E0E0E0',
     },
-    scoreDotFilled: {
-        backgroundColor: '#118AB2',
-    },
     answerValue: {
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#118AB2',
     },
     continueButton: {
         backgroundColor: 'white',

@@ -103,9 +103,14 @@ export default function Onboarding() {
   }
  
   const finishOnboarding = () => {
-    // Calcul du score de phobie administrative par exemple
-    console.log("Réponses de l'utilisateur :", answers);
-    navigation.navigate('onboardingResults', { answers }); // On peut passer les réponses à l'écran de résultats
+    // Remplace les IDs par les catégories avant de naviguer
+    const categorizedAnswers = Object.fromEntries(
+      Object.entries(answers).map(([id, score]) => {
+        const q = questions.find(q => q.id === id);
+        return [q?.category ?? id, score];
+      })
+    );
+    navigation.navigate('onboardingResults', { answers: categorizedAnswers });
   };
 
   const renderItem = ({ item } : { item: any }) => {
