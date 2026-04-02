@@ -17,7 +17,7 @@ const questions = [
       { id: 'b', label: "Je repousse souvent au lendemain", score: 3, icon: "⏳" },
       { id: 'c', label: "Une véritable source d'angoisse", score: 5, icon: "😨" }
     ],
-    backgroundColor: '#FF6B6B', // Rouge corail
+    backgroundColor: '#B4E1FF',
   },
   {
     id: '2',
@@ -28,7 +28,7 @@ const questions = [
       { id: 'b', label: "Je stresse mais je regarde l'appli", score: 3, icon: "👀" },
       { id: 'c', label: "Je fais l'autruche totale", score: 5, icon: "🙈" }
     ],
-    backgroundColor: '#4ECDC4', // Turquoise
+    backgroundColor: '#B2FA84',
   },
   {
     id: '3',
@@ -39,7 +39,7 @@ const questions = [
       { id: 'b', label: "C'est un peu flou mais je m'en sors", score: 3, icon: "🤷‍♂️" },
       { id: 'c', label: "L'idée même me paralyse", score: 5, icon: "🥶" }
     ],
-    backgroundColor: '#FFD166', // Jaune moutarde (texte sombre nécessaire ici)
+    backgroundColor: '#FFACE4',
   },
   {
     id: '4',
@@ -50,7 +50,7 @@ const questions = [
       { id: 'b', label: "Dans la semaine", score: 3, icon: "🗓️" },
       { id: 'c', label: "Quand la pile devient trop haute", score: 5, icon: "📚" }
     ],
-    backgroundColor: '#118AB2', // Bleu profond
+    backgroundColor: '#8CD7D0',
   },
   {
     id: '5',
@@ -61,7 +61,7 @@ const questions = [
       { id: 'b', label: "Avec l'aide d'un proche, oui", score: 3, icon: "🤝" },
       { id: 'c', label: "Rien que d'y penser, j'abandonne", score: 5, icon: "🏳️" }
     ],
-    backgroundColor: '#073B4C', // Bleu marine
+    backgroundColor: '#AB87FF',
   }
 ];
 
@@ -110,6 +110,7 @@ export default function Onboarding() {
         return [q?.category ?? id, score];
       })
     );
+    // @ts-ignore
     navigation.navigate('onboardingResults', { answers: categorizedAnswers });
   };
 

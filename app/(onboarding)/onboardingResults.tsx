@@ -29,14 +29,14 @@ export default function OnboardingResults({route} : {route: any}) {
             case 2: return { color: '#4ECDC4', bg: '#F0FAFA', emoji: '🙂', label: 'Légère anxiété', borderColor: '#4ECDC4' };
             case 3: return { color: '#FFD60A', bg: '#FFFDF0', emoji: '😐', label: 'Anxiété modérée', borderColor: '#FFD60A' };
             case 4: return { color: '#FF6B35', bg: '#FFF5F0', emoji: '😟', label: 'Forte anxiété', borderColor: '#FF6B35' };
-            case 5: return { color: '#EF476F', bg: '#FFF0F4', emoji: '😰', label: 'Phobie sévère', borderColor: '#EF476F' };
+            case 5: return { color: '#FFACE4', bg: '#FFF0F4', emoji: '😰', label: 'Phobie sévère', borderColor: '#EF476F' };
             default: return { color: '#118AB2', bg: '#F0F8FF', emoji: '❓', label: 'Non évalué', borderColor: '#118AB2' };
         }
     };
 
     return (
         <LinearGradient
-            colors={['#118AB2', '#06D6A0']}
+            colors={['#8CD7D0', '#FFACE4']}
             style={styles.container}
         >
             <SafeAreaView style={styles.safeArea}>
