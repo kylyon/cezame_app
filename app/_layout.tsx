@@ -1,18 +1,19 @@
 import { createStaticNavigation, DarkTheme, DefaultTheme, NavigationIndependentTree, ThemeProvider } from '@react-navigation/native';
-// Import the createNativeStackNavigator function to create a stack navigator
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import React from 'react';
 import { useColorScheme } from 'react-native';
 import Onboarding from './(onboarding)/onboarding';
 import OnboardingResults from './(onboarding)/onboardingResults';
+import Hub from './(hub)/hub';
+import DomainDetail from './(hub)/domainDetail';
+import TutorialStep from './(hub)/tutorialStep';
+import { ProgressProvider } from '@/context/ProgressContext';
 
-
-
-const OnboardingStack = createNativeStackNavigator(
+const AppStack = createNativeStackNavigator(
   {
     screens: {
-      onboarding : {
+      onboarding: {
         screen: Onboarding,
         options: { headerShown: false },
       },
@@ -20,21 +21,34 @@ const OnboardingStack = createNativeStackNavigator(
         screen: OnboardingResults,
         options: { headerShown: false },
       },
-    }
+      hub: {
+        screen: Hub,
+        options: { headerShown: false },
+      },
+      domainDetail: {
+        screen: DomainDetail,
+        options: { headerShown: false },
+      },
+      tutorialStep: {
+        screen: TutorialStep,
+        options: { headerShown: false },
+      },
+    },
   }
 );
 
-const Navigation = createStaticNavigation(OnboardingStack);
+const Navigation = createStaticNavigation(AppStack);
 
-export default function OnboardingLayout() {
+export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <NavigationIndependentTree>
-        <Navigation  />
-      </NavigationIndependentTree>
-    </ThemeProvider>
-      
+    <ProgressProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <NavigationIndependentTree>
+          <Navigation />
+        </NavigationIndependentTree>
+      </ThemeProvider>
+    </ProgressProvider>
   );
 }

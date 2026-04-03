@@ -1,5 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -7,7 +7,7 @@ const { width } = Dimensions.get('window');
 
 export default function OnboardingResults({route} : {route: any}) {
     const { answers } = route.params;
-    const router = useRouter();
+    const navigation = useNavigation();
 
     const totalScore = (Object.values(answers) as number[]).reduce((sum: number, score: number) => sum + score, 0);
     const maxScore = Object.keys(answers).length * 5; // Supposant que le score max par question est 5
@@ -141,11 +141,12 @@ export default function OnboardingResults({route} : {route: any}) {
                     </View>
 
                     {/* Bouton d'action */}
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.continueButton}
-                        onPress={() => router.push('/(tabs)')}
+                        // @ts-ignore
+                        onPress={() => navigation.navigate('hub')}
                     >
-                        <Text style={styles.continueButtonText}>Continuer vers l'application</Text>
+                        <Text style={styles.continueButtonText}>Découvrir mes parcours 🚀</Text>
                     </TouchableOpacity>
 
                     <View style={styles.bottomSpacer} />
